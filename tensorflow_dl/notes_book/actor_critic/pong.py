@@ -85,6 +85,7 @@ if __name__ == '__main__':
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE, epsilon=1e-3)
 
+    best_reward = None
     batch = []
 
     for step_idx, exp in enumerate(exp_source):
@@ -92,7 +93,9 @@ if __name__ == '__main__':
 
         new_rewards = exp_source.pop_total_rewards()
         if new_rewards:
-            print("New rewards: ", new_rewards)
+            if best_reward is None or new_rewards[0] > best_reward:
+                best_reward = new_rewards[0]
+                print("New rewards: ", best_reward)
 
         if len(batch) < BATCH_SIZE:
             continue
