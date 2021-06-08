@@ -38,7 +38,7 @@ class AtariA2C(tf.keras.Model):
         ])
 
     def call(self, x, training=None, mask=None):
-        fx = tf.cast(x, tf.float32) / 256
+        fx = tf.cast(x, tf.float32) / 256.0
         conv_out = self.conv(fx)
         return self.policy(conv_out), self.value(conv_out)
 
@@ -103,7 +103,10 @@ if __name__ == '__main__':
         if new_rewards:
             if best_reward is None or new_rewards[0] > best_reward:
                 best_reward = new_rewards[0]
-                net.save("/")
+                if os.path.exists(saved_path):
+                    net.save(saved_path)
+                else:
+                    net.save("/")
                 print("New rewards: ", best_reward)
 
         if len(batch) < BATCH_SIZE:
