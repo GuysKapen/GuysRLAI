@@ -1,3 +1,5 @@
+import os
+
 import gym
 import numpy as np
 import tensorflow as tf
@@ -78,7 +80,13 @@ if __name__ == '__main__':
     make_env = lambda: common.wrap_dqn(gym.make('PongNoFrameskip-v4'))
     envs = [make_env() for _ in range(NUM_ENVS)]
 
-    net = AtariA2C(envs[0].action_space.n)
+    saved_path = "/content/data/MyDrive/models/AtariA2C"
+    if os.path.exists(saved_path):
+        net = tf.keras.models.load_model(saved_path)
+        print("#" * 24)
+        print("Restored saved model!")
+    else:
+        net = AtariA2C(envs[0].action_space.n)
 
     agent = agent.PolicyAgent(lambda x: net(x)[0], apply_softmax=True)
     exp_source = experience.ExperienceSourceFirstLast(envs, agent, gamma=GAMMA, steps_count=REWARD_STEPS)
@@ -95,6 +103,7 @@ if __name__ == '__main__':
         if new_rewards:
             if best_reward is None or new_rewards[0] > best_reward:
                 best_reward = new_rewards[0]
+                net.save("/")
                 print("New rewards: ", best_reward)
 
         if len(batch) < BATCH_SIZE:
