@@ -67,7 +67,7 @@ def unpack_batch(batch, net):
     # handle rewards
     rewards_np = np.array(rewards, dtype=np.float32)
     if not_done_idx:
-        last_states_v = tf.convert_to_tensor(np.array(last_states, copy=False), tf.float32)
+        last_states_v = tf.convert_to_tensor(np.array(last_states, copy=False))
         last_vals_v = net(last_states_v)[1]
         last_vals_np = last_vals_v.numpy()[:, 0]
         rewards_np[not_done_idx] += GAMMA ** REWARD_STEPS * last_vals_np
