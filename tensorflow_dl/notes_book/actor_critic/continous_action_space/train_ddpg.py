@@ -68,15 +68,19 @@ if __name__ == '__main__':
     test_env = gym.make(ENV_ID)
 
     save_path = "/content/data/MyDrive/models/RobotDDPG"
+    save_path_critic = "/content/data/MyDrive/models/RobotDDPGCritic"
     if os.path.exists(save_path):
-        net = tf.keras.models.load_model(save_path)
+        act_net = tf.keras.models.load_model(save_path)
         print("#" * 60)
-        print("Restored saved model!")
+        print("Restored actor saved model!")
     else:
-        net = A2C(env.action_space.shape[0])
-
-    act_net = DDPGActor(env.action_space.shape[0])
-    crt_net = DDPGCritic(env.action_space.shape[0])
+        act_net = DDPGActor(env.action_space.shape[0])
+    if os.path.exists(save_path_critic):
+        crt_net = tf.keras.models.load_model(save_path)
+        print("#" * 60)
+        print("Restored critic saved model!")
+    else:
+        crt_net = DDPGCritic(env.action_space.shape[0])
 
     target_act_net = DDPGActor(env.action_space.shape[0])
     target_crt_net = DDPGCritic(env.action_space.shape[0])
@@ -140,4 +144,5 @@ if __name__ == '__main__':
                     name = "best_%+.3f_%d.dat" % (rewards, step_idx)
                     fname = os.path.join(save_path, name)
                     act_net.save(save_path)
+                    crt_net.save(save_path_critic)
                 best_reward = rewards
