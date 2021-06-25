@@ -78,7 +78,7 @@ class D4PGCritic(tf.keras.Model):
 
         delta = (v_max - v_min) / (n_atoms - 1)
 
-        self.supports = tf.Variable(tf.convert_to_tensor(range(v_min, v_max + delta, delta), dtype=tf.float32))
+        self.supports = tf.Variable(tf.convert_to_tensor(tf.range(v_min, v_max + delta, delta), dtype=tf.float32), trainable=False)
 
     def call(self, inputs, training=None, mask=None):
         x, a = inputs
