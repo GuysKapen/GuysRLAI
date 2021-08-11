@@ -76,7 +76,7 @@ if __name__ == '__main__':
     else:
         act_net = DDPGActor(env.action_space.shape[0])
     if os.path.exists(save_path_critic):
-        crt_net = tf.keras.models.load_model(save_path)
+        crt_net = tf.keras.models.load_model(save_path_critic)
         print("#" * 60)
         print("Restored critic saved model!")
     else:
