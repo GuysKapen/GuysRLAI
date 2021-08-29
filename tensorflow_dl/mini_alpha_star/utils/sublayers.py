@@ -10,7 +10,7 @@ class ScaledDotProductAttention(tf.keras.Model):
 
     def call(self, inputs, training=None, mask=None):
         q, k, v = inputs
-        attn = tf.matmul(q / self.temperature, tf.transpose(k, perm=(2, 3)))
+        attn = tf.matmul(q / self.temperature, tf.transpose(k, perm=(0, 1, 3, 2)))
         if mask is not None:
             attn = tf.where(mask == 0, -1e9, attn)
         attn = self.dropout(attn)
@@ -23,6 +23,9 @@ class ScaledDotProductAttention(tf.keras.Model):
 
 
 class MultiHeadAttention(tf.keras.Model):
+    def get_config(self):
+        pass
+
     def __init__(self, n_head, d_model, d_k, d_v, dropout=.1):
         super(MultiHeadAttention, self).__init__()
         self.n_head = n_head
@@ -56,7 +59,8 @@ class MultiHeadAttention(tf.keras.Model):
         v = tf.reshape(self.w_v(v), shape=(batch_size, len_v, n_head, d_v))
 
         # Transpose for attention dot product
-        q, k, v = tf.transpose(q, perm=(1, 2)), tf.transpose(k, perm=(1, 2)), tf.transpose(v, perm=(1, 2))
+        q, k, v = tf.transpose(q, perm=(0, 2, 1, 3)), tf.transpose(k, perm=(0, 2, 1, 3)), tf.transpose(v, perm=(
+        0, 2, 1, 3))
 
         if mask is not None:
             mask = tf.expand_dims(mask, axis=1)  # broadcasting
@@ -68,7 +72,7 @@ class MultiHeadAttention(tf.keras.Model):
         # attn x v = (b, n, l_q, d_v)
 
         # Transpose back b x l_q x n x d_v and merge heads b x l_q x (n*d_v)
-        q = tf.reshape(tf.transpose(q, perm=(1, 2)), shape=(batch_size, len_q, -1))
+        q = tf.reshape(tf.transpose(q, perm=(0, 2, 1, 3)), shape=(batch_size, len_q, -1))
         q = self.dropout(self.fc(q))
 
         # q = (b, l_q, n * d_v) x (n * d_v, d_m) = (b, l_q, d_m)
@@ -86,7 +90,6 @@ class PositionWiseFeedForward(tf.keras.Model):
         self.dropout = layers.Dropout(dropout)
 
     def call(self, inputs, training=None, mask=None):
-
         residual = inputs
         x = self.norm(inputs)
         x = self.w_2(tf.nn.relu(self.w_1(x)))
@@ -95,3 +98,5 @@ class PositionWiseFeedForward(tf.keras.Model):
 
         return x
 
+    def get_config(self):
+        pass

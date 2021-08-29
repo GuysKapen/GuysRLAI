@@ -44,6 +44,25 @@ class Encoder(tf.keras.Model):
         return enc_output,
 
 
+class DecoderLayer(tf.keras.Model):
+    def __init__(self, d_model, d_inner, n_head, d_k, d_v, dropout=0.1):
+        super(DecoderLayer, self).__init__()
+        self.sef_attn = MultiHeadAttention(n_head, d_model, d_k, d_v, dropout)
+        self.enc_attn = MultiHeadAttention(n_head, d_model, d_k, d_v, dropout)
+        self.pos_ffn = PositionWiseFeedForward(d_model, d_inner, dropout)
+
+    def call(self, inputs, training=None, mask=None):
+        dec_input, enc_output = inputs
+        slf_attn_mask, dec_enc_attn_mask = mask
+        dec_output, dec_slf_attn = self.sef_attn((dec_input, dec_input, dec_input), mask=slf_attn_mask)
+        dec_output, dec_enc_attn = self.enc_attn((dec_output, enc_output, enc_output), mask=dec_enc_attn_mask)
+        dec_output = self.pos_ffn(dec_output)
+        return dec_output, dec_slf_attn, dec_enc_attn
+
+    def get_config(self):
+        pass
+
+
 class Transformer(tf.keras.Model):
     def get_config(self):
         pass
@@ -62,6 +81,6 @@ class Transformer(tf.keras.Model):
         )
 
     def call(self, inputs, training=None, mask=None):
-        enc_output, _ = self.encoder(inputs)
+        enc_output, *_ = self.encoder(inputs)
 
         return enc_output
