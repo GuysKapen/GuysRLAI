@@ -646,7 +646,7 @@ class Entity(object):
                  display_type=1, x=123, y=218, is_cloaked=3, is_powered=True, is_hallucination=False, is_active=True,
                  is_on_screen=True, is_in_cargo=False, current_minerals=1000, current_vespene=1500, mined_minerals=500,
                  mined_vespene=300, assigned_harvesters=8, ideal_harvesters=14, weapon_cooldown=5.0,
-                 orders=[0, 1, 3, 0],
+                 orders=(0, 1, 3, 0),
                  attack_upgrade_level=2, armor_upgrade_level=1, shield_upgrade_level=0, is_selected=True,
                  is_targeted=False,
                  order_length=4, order_id_0=1, order_id_1=0, order_id_2=3, order_id_3=2, order_progress_0=50,
