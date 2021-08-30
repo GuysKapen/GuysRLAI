@@ -2,6 +2,7 @@ import gym
 import tensorflow as tf
 import numpy as np
 import tensorflow.keras.layers as layers
+import time
 
 MAX_BATCH_EPISODES = 100
 MAX_BATCH_STEPS = 10000
@@ -54,11 +55,14 @@ def sample_noise(net):
 
 
 def evaluate_with_noise(env, net, noises):
-    old_weights = net.get_weights()
+    scaled_noises = []
     for param, noise in zip(net.trainable_variables, noises):
-        param.assign_add(NOISE_STD * noise)
+        scaled_noise = NOISE_STD * noise
+        param.assign_add(scaled_noise)
+        scaled_noises.append(scaled_noise)
     reward, steps = evaluate(env, net)
-    net.set_weights(old_weights)
+    for param, scaled_noise in zip(net.trainable_variables, scaled_noises):
+        param.assign_sub(scaled_noise)
     return reward, steps
 
 
@@ -102,28 +106,30 @@ if __name__ == '__main__':
 
     step_idx = 0
     while True:
+        t_start = time.time()
         batch_noise = []
         batch_reward = []
-        batch_step = 0
+        batch_steps = 0
         for _ in range(MAX_BATCH_EPISODES):
             pos_noise, neg_noise = sample_noise(net)
             batch_noise.append(pos_noise)
             batch_noise.append(neg_noise)
             reward, steps = evaluate_with_noise(env, net, pos_noise)
             batch_reward.append(reward)
-            batch_step += steps
+            batch_steps += steps
             reward, steps = evaluate_with_noise(env, net, neg_noise)
             batch_reward.append(reward)
-            batch_step += steps
-            if batch_step > MAX_BATCH_STEPS:
+            batch_steps += steps
+            if batch_steps > MAX_BATCH_STEPS:
                 break
         
         step_idx += 1
         mean_reward = np.mean(batch_reward)
-        print(f"Steps {step_idx}, reward: {mean_reward}")
         if mean_reward > 199:
             print(f"Solved in {step_idx} steps!")
             break
 
         train_step(net, batch_noise, batch_reward)
+        speed = batch_steps / (time.time() - t_start)
+        print("%d: reward=%.2f, speed=%.2f f/s" % (step_idx, mean_reward, speed))
 

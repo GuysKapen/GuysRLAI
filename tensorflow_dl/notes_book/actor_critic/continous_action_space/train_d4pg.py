@@ -169,7 +169,7 @@ if __name__ == '__main__':
         critic_gradients = g.gradient(critic_loss_v, crt_net.trainable_variables)
         optimizer.apply_gradients(zip(critic_gradients, crt_net.trainable_variables))
 
-        actor_gradients = g.gradient(actor_loss_v, act_net.trainablecrt_distr_v_variables)
+        actor_gradients = g.gradient(actor_loss_v, act_net.trainable_variables)
         optimizer.apply_gradients(zip(actor_gradients, act_net.trainable_variables))
 
         target_act_net.set_weights(arrays_multi_alpha_blend(target_act_net.get_weights(), act_net.get_weights(), ALPHA))
