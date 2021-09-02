@@ -16,8 +16,9 @@ class ResBlockFiLM(tf.keras.Model):
     def __init__(self, filter_size):
         super(ResBlockFiLM, self).__init__()
 
-        self.conv1 = layers.Conv2D(filter_size, kernel_size=1, strides=1, padding='valid', activation='relu')
-        self.conv2 = layers.Conv2D(filter_size, kernel_size=3, strides=1, padding='same')
+        self.conv1 = layers.Conv2D(filter_size, kernel_size=1, strides=1, padding='valid', activation='relu',
+                                   data_format='channels_first')
+        self.conv2 = layers.Conv2D(filter_size, kernel_size=3, strides=1, padding='same', data_format='channels_first')
         self.bn = layers.BatchNormalization()
 
     def call(self, inputs, training=None, mask=None):
@@ -90,9 +91,11 @@ class LocationHead(tf.keras.Model):
         self.us_4 = layers.Conv2DTranspose(int(mmc / 16), kernel_size=4, strides=2, padding='same', use_bias=True,
                                            data_format='channels_first')
 
-        self.us_4_original = layers.Conv2DTranspose(1, kernel_size=4, strides=2, padding='same', use_bias=True)
+        self.us_4_original = layers.Conv2DTranspose(1, kernel_size=4, strides=2, padding='same', use_bias=True,
+                                                    data_format='channels_first')
 
-        self.us_5 = layers.Conv2DTranspose(1, kernel_size=4, strides=2, padding='same', use_bias=True)
+        self.us_5 = layers.Conv2DTranspose(1, kernel_size=4, strides=2, padding='same', use_bias=True,
+                                           data_format='channels_first')
 
         self.output_map_size = output_map_size
         self.softmax = layers.Softmax(axis=-1)
@@ -194,9 +197,7 @@ class LocationHead(tf.keras.Model):
         target_location_mask = utils.action_involve_targeting_location_mask(action_type)
         # target_location_mask: [b x 1]
         print(f'target_location_mask: {target_location_mask}') if debug else None
-
-        print(f"location_out: {location_out}") if debug else None
-        location_out = tf.convert_to_tensor(location_out)
+        location_out = tf.squeeze(tf.convert_to_tensor(location_out))
         print(f"location_out: {location_out}") if debug else None
         print(f'location_out.shape: {location_out.shape}') if debug else None
 

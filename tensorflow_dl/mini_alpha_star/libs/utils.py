@@ -402,13 +402,14 @@ def action_involve_targeting_location_mask(action_types):
     :return: mask
     """
 
-    mask = tf.zeros_like(action_types)
+    mask = np.zeros_like(action_types)
     action_types = tf.stop_gradient(action_types).numpy()
 
     for i, action_type in enumerate(action_types):
+        action_type_index = action_type.item()
 
-        print('i:', i, 'action_type_index:', action_type) if debug else None
+        print('i:', i, 'action_type_index:', action_type_index) if debug else None
 
-        mask[i] = action_involve_targeting_location(action_type)
+        mask[i] = action_involve_targeting_location(action_type_index)
 
     return mask
