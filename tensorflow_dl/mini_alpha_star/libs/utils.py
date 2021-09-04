@@ -262,12 +262,13 @@ def action_can_be_queued_mask(action_types):
     :param action_types:
     :return:
     """
-    mask = tf.zeros_like(action_types)
+    mask = np.zeros_like(action_types)
     action_types = tf.stop_gradient(action_types).numpy()
 
     for i, action_type in enumerate(action_types):
-        print(f'i: {i}, action_type_index: {action_type}') if debug else None
-        mask[i] = action_can_be_queued(action_type)
+        action_type_index = action_type.item()
+        print(f'i: {i}, action_type_index: {action_type_index}') if debug else None
+        mask[i] = action_can_be_queued(action_type_index)
 
     return mask
 
