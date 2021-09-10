@@ -297,8 +297,9 @@ def action_can_apply_to_entity_types_mask(action_types):
     action_types = tf.stop_gradient(action_types).numpy()
 
     for i, action_type in enumerate(action_types):
-        print(f'i: {i}, action_type: {action_type}') if debug else None
-        mask = action_can_apply_to_entity_types(action_type)
+        action_type_index = action_type.item()
+        print(f'i: {i}, action_type_index: {action_type_index}') if debug else None
+        mask = action_can_apply_to_entity_types(action_type_index)
         mask_list.append(mask)
 
     batch_mask = tf.concat(mask_list, axis=0)
@@ -341,13 +342,14 @@ def action_involve_selecting_units_mask(action_types):
     :return: mask
     """
 
-    mask = tf.zeros_like(action_types)
+    mask = np.zeros_like(action_types)
     action_types = tf.stop_gradient(action_types).numpy()
 
     for i, action_type in enumerate(action_types):
-        print(f'i: {i}, action_type: {action_type}') if debug else None
+        action_type_index = action_type.item()
+        print(f'i: {i}, action_type_index: {action_type_index}') if debug else None
 
-        mask[i] = action_involve_selection_units(action_type)
+        mask[i] = action_involve_selection_units(action_type_index)
 
     return mask
 
@@ -372,13 +374,14 @@ def action_involve_targeting_units_mask(action_types):
     :return:
     """
 
-    mask = tf.zeros_like(action_types)
+    mask = np.zeros_like(action_types)
     action_types = tf.stop_gradient(action_types).numpy()
 
     for i, action_type in enumerate(action_types):
-        print(f'i: {i}, aciton_type: {action_types}') if debug else None
+        action_type_index = action_type.item()
+        print(f'i: {i}, action_type_index: {action_type_index}') if debug else None
 
-        mask[i] = action_involve_targeting_units(action_type)
+        mask[i] = action_involve_targeting_units(action_type_index)
 
     return mask
 
