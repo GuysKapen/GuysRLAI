@@ -12,8 +12,7 @@ class GLU(tf.keras.Model):
         self.fc2 = layers.Dense(output_size)
         self.sigmoid = tf.keras.layers.Activation(activation='sigmoid')
 
-    def call(self, inputs, training=None, mask=None):
-        x, context = inputs
+    def forward(self, x, context):
         # context shape: b x context_size
         gate = self.sigmoid(self.fc1(context))
         # gate shape: b x input_size
@@ -24,6 +23,10 @@ class GLU(tf.keras.Model):
         output = self.fc2(gated_input)
         # output: b x output_size
         return output
+
+    def call(self, inputs, training=None, mask=None, *args, **kwargs):
+        x, context = inputs
+        return self.forward(x, context)
 
 
 def test():
