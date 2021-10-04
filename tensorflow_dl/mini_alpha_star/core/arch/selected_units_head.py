@@ -7,7 +7,7 @@ from tensorflow_dl.mini_alpha_star.libs.hyper_params import Arch_Hyper_Parameter
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import Scalar_Feature_Size as SFS
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import StarCraft_Hyper_Parameters as SCHP
 
-debug = True
+debug = False
 
 
 class SelectedUnitsHead(tf.keras.Model):
@@ -258,6 +258,10 @@ class SelectedUnitsHead(tf.keras.Model):
 
         return units_logits, units, autoregressive_embedding
 
+    def call(self, inputs, training=None, mask=None):
+        autoregressive_embedding, action_type, entity_embeddings = inputs
+        return self.forward(autoregressive_embedding, action_type, entity_embeddings)
+
 
 def test():
     batch_size = 2
@@ -273,8 +277,7 @@ def test():
           autoregressive_embedding.shape) if debug else None
 
     units_logits, units, autoregressive_embedding = \
-        selected_units_head.forward(
-            autoregressive_embedding, action_type, entity_embeddings)
+        selected_units_head((autoregressive_embedding, action_type, entity_embeddings))
 
     if units_logits is not None:
         print("units_logits:", units_logits) if debug else None

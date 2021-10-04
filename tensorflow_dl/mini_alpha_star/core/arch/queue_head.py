@@ -6,7 +6,7 @@ from tensorflow_dl.mini_alpha_star.libs import utils
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import Arch_Hyper_Parameters as AHP
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import Scalar_Feature_Size as SFS
 
-debug = True
+debug = False
 
 
 class QueueHead(tf.keras.Model):

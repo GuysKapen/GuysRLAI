@@ -10,7 +10,7 @@ from tensorflow_dl.mini_alpha_star.libs.hyper_params import Arch_Hyper_Parameter
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import Scalar_Feature_Size as SFS
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import StarCraft_Hyper_Parameters as SCHP
 
-debug = True
+debug = False
 
 
 class ScalarEncoder(tf.keras.Model):
@@ -219,6 +219,9 @@ class ScalarEncoder(tf.keras.Model):
         scalar_context_out = F.relu(self.fc_2(scalar_context))
 
         return embedded_scalar_out, scalar_context_out
+
+    def call(self, inputs, training=None, mask=None):
+        return self.forward(inputs)
 
 
 def test():

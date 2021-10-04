@@ -25,7 +25,7 @@ from tensorflow_dl.mini_alpha_star.core.sl import losses as Loss
 # from tensorflow_dl.mini_alpha_star.core.sl.dataset import OneReplayDataset, AllReplayDataset
 from tensorflow_dl.mini_alpha_star.libs.utils import load_latest_model
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import Arch_Hyper_Parameters as AHP
-from tensorflow_dl.mini_alpha_star.libs.hyper_params import SL_Training_Hyper_parameters as SLTHP
+from tensorflow_dl.mini_alpha_star.libs.hyper_params import SL_Training_Hyper_Parameters as SLTHP
 
 __author__ = "Ruo-Ze Liu"
 

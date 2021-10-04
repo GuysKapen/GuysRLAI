@@ -21,7 +21,7 @@ from tensorflow_dl.mini_alpha_star.libs.hyper_params import Arch_Hyper_Parameter
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import StarCraft_Hyper_Parameters as SCHP
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import Label_Size as LS
 
-debug = True
+debug = False
 
 
 class ActionTypeHead(tf.keras.Model):

@@ -11,7 +11,7 @@ debug = True
 
 
 class ArgsAction(object):
-    def __init__(self, action_type, delay=SCHP.sc2_default_delay, queue=0,
+    def __init__(self, action_type=0, delay=SCHP.sc2_default_delay, queue=0,
                  units=None, target_unit=None,
                  target_location=None, use_tag=False):
         super(ArgsAction, self).__init__()
@@ -119,8 +119,9 @@ class ArgsAction(object):
         target_location_encoding = tf.zeros((batch_size, self.output_map_size, self.output_map_size))
         for i, z in enumerate(self.target_location):
             (x, y) = z
-            target_row_col = (y, x)
-            target_location_encoding[i, y, x] = 1
+            # target_row_col = (y, x)
+            # target_location_encoding[i, y, x] = 1
+            target_unit_encoding = tf.tensor_scatter_nd_update(target_location_encoding, [[i, y, x]], [1])
 
         print('self.target_location:', self.target_location) if debug else None
         print('target_location_encoding:', target_location_encoding) if debug else None

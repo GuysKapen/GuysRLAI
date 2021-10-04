@@ -9,22 +9,24 @@ from tensorflow_dl.mini_alpha_star.libs.hyper_params import Scalar_Feature_Size 
 
 from tensorflow_dl.mini_alpha_star.libs import utils
 
-debug = True
+debug = False
 
 
 class ResBlockFiLM(tf.keras.Model):
     def __init__(self, filter_size):
         super(ResBlockFiLM, self).__init__()
 
-        self.conv1 = layers.Conv2D(filter_size, kernel_size=1, strides=1, padding='valid', activation='relu',
-                                   data_format='channels_first')
-        self.conv2 = layers.Conv2D(filter_size, kernel_size=3, strides=1, padding='same', data_format='channels_first')
+        self.conv1 = layers.Conv2D(filter_size, kernel_size=1, strides=1, padding='valid', activation='relu')
+        self.conv2 = layers.Conv2D(filter_size, kernel_size=3, strides=1, padding='same')
         self.bn = layers.BatchNormalization()
 
     def call(self, inputs, training=None, mask=None):
         x, gamma, beta = inputs
+        x = tf.transpose(x, perm=[0, 2, 3, 1])
         res = self.conv1(x)
         out = self.conv2(res)
+        res = tf.transpose(res, perm=[0, 3, 1, 2])
+        out = tf.transpose(out, perm=[0, 3, 1, 2])
         out = self.bn(out)
 
         gamma = gamma[..., None, None]
@@ -77,25 +79,18 @@ class LocationHead(tf.keras.Model):
 
         mmc = max_map_channels
 
-        self.ds_1 = layers.Conv2D(mmc, kernel_size=1, strides=1, padding='valid', use_bias=True,
-                                  data_format='channels_first')
+        self.ds_1 = layers.Conv2D(mmc, kernel_size=1, strides=1, padding='valid', use_bias=True)
 
         self.film_net = FiML(n_resblock=4, conv_hidden=mmc, gate_size=autoregressive_embedding_size)
 
-        self.us_1 = layers.Conv2DTranspose(int(mmc / 2), kernel_size=4, strides=2, padding='same', use_bias=True,
-                                           data_format='channels_first')
-        self.us_2 = layers.Conv2DTranspose(int(mmc / 4), kernel_size=4, strides=2, padding='same', use_bias=True,
-                                           data_format='channels_first')
-        self.us_3 = layers.Conv2DTranspose(int(mmc / 8), kernel_size=4, strides=2, padding='same', use_bias=True,
-                                           data_format='channels_first')
-        self.us_4 = layers.Conv2DTranspose(int(mmc / 16), kernel_size=4, strides=2, padding='same', use_bias=True,
-                                           data_format='channels_first')
+        self.us_1 = layers.Conv2DTranspose(int(mmc / 2), kernel_size=4, strides=2, padding='same', use_bias=True)
+        self.us_2 = layers.Conv2DTranspose(int(mmc / 4), kernel_size=4, strides=2, padding='same', use_bias=True)
+        self.us_3 = layers.Conv2DTranspose(int(mmc / 8), kernel_size=4, strides=2, padding='same', use_bias=True)
+        self.us_4 = layers.Conv2DTranspose(int(mmc / 16), kernel_size=4, strides=2, padding='same', use_bias=True)
 
-        self.us_4_original = layers.Conv2DTranspose(1, kernel_size=4, strides=2, padding='same', use_bias=True,
-                                                    data_format='channels_first')
+        self.us_4_original = layers.Conv2DTranspose(1, kernel_size=4, strides=2, padding='same', use_bias=True)
 
-        self.us_5 = layers.Conv2DTranspose(1, kernel_size=4, strides=2, padding='same', use_bias=True,
-                                           data_format='channels_first')
+        self.us_5 = layers.Conv2DTranspose(1, kernel_size=4, strides=2, padding='same', use_bias=True)
 
         self.output_map_size = output_map_size
         self.softmax = layers.Softmax(axis=-1)
@@ -137,8 +132,9 @@ class LocationHead(tf.keras.Model):
         x = tf.concat([autoregressive_embedding_map, map_skip], axis=1)
         print(f'x.shape: {x.shape}') if debug else None
 
+        x = tf.transpose(x, perm=[0, 2, 3, 1])
         x = tf.nn.relu(self.ds_1(tf.nn.relu(x)))
-
+        x = tf.transpose(x, perm=[0, 3, 1, 2])
         # 3d tensor (h, w, c) is then passed through series of gated resblocks
         # with 128 channels, kernel size 3 and FiLM, gated on autoregressive_embedding
         # FilM is Feature wise Linear Modulation, paper: FiLM: Visual Reasoning with General Conditioning Layer
@@ -147,7 +143,7 @@ class LocationHead(tf.keras.Model):
         # x [-1, 128, 16, 16]
         # Using the elements of map_skip i order of last Resblockskip to first
         x = x + map_skip
-
+        x = tf.transpose(x, perm=[0, 2, 3, 1])
         # Afterwards, it is upsampled 2x by each of a series of transpose conv
         # with kernel 4 and channel 128, 64, 16 and 1 respectively
         # Upsampled beyond the 128x128 input to 256x256 target location selection
@@ -161,7 +157,7 @@ class LocationHead(tf.keras.Model):
             x = tf.nn.relu(self.us_5(x))
         else:
             x = tf.nn.relu(self.us_4_original(x))
-
+        x = tf.transpose(x, perm=[0, 3, 1, 2])
         # Those final logits are flattened and sampled (masking out invalid locations using action_type
         # Such as those outside the camera for build actions) with temperature .8
         # to get the actual target position

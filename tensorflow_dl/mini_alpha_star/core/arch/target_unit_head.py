@@ -7,7 +7,7 @@ from tensorflow_dl.mini_alpha_star.libs.hyper_params import Arch_Hyper_Parameter
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import Scalar_Feature_Size as SFS
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import StarCraft_Hyper_Parameters as SCHP
 
-debug = True
+debug = False
 
 
 class TargetUnitHead(tf.keras.Model):
@@ -172,6 +172,10 @@ class TargetUnitHead(tf.keras.Model):
             target_unit = target_unit * tf.expand_dims(tf.cast(target_unit_mask, dtype=tf.int64), axis=-1)
 
             return target_unit_logits, target_unit
+
+    def call(self, inputs, training=None, mask=None):
+        autoregressive_embedding, action_type, entity_embeddings = inputs
+        return self.forward(autoregressive_embedding, action_type=action_type, entity_embeddings=entity_embeddings)
     
 
 def test():

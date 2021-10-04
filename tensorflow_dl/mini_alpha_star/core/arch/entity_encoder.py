@@ -8,7 +8,7 @@ from tensorflow_dl.mini_alpha_star.libs.hyper_params import StarCraft_Hyper_Para
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import MiniStar_Arch_Hyper_Parameters as MAHP
 from tensorflow_dl.mini_alpha_star.libs.transformer import Transformer
 
-debug = True
+debug = False
 
 
 def dec_to_bin(x, bits):

@@ -5,7 +5,7 @@ from tensorflow_dl.mini_alpha_star.libs import utils
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import Arch_Hyper_Parameters as AHP
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import Scalar_Feature_Size as SFS
 
-debug = True
+debug = False
 
 
 def check_nan_and_inf(val, name):
@@ -71,7 +71,7 @@ class DelayHead(tf.keras.Model):
         # 2-layer linear network with relu and added to auto_regressive_embedding
         # similar to action_type here, change it to one_hot version
         delay_one_hot = utils.one_hot_embedding(delay, self.max_delay)
-
+        delay_one_hot = tf.squeeze(delay_one_hot, axis=-2)
         # make the axis of delay_one_hot as delay
         print(f'delay_one_hot: {delay_one_hot}') if debug else None
         print(f'delay_one_hot.shape: {delay_one_hot.shape}') if debug else None

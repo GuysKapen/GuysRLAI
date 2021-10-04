@@ -94,15 +94,15 @@ class ConstSize(object):
     All_Units_Size = len(Neutral) + len(Protoss) + len(Terran) + len(Zerg)
 
 
-ArchHyperParameters = namedtuple("ArchHyperParameters", ['batch_size',
+ArchHyperParameters = namedtuple('ArchHyperParameters', ['batch_size',
                                                          'sequence_length',
-                                                         'max_entities',
+                                                         'max_entities', 
                                                          'max_selected',
-                                                         'minimap_size',
-                                                         'embedding_size',
+                                                         'minimap_size', 'embedding_size', 
                                                          'map_channels',
-                                                         'entity_x_y_index',
-                                                         'scalar_encoder_fc1_input',
+                                                         'scatter_channels',
+                                                         'entity_x_y_index', 
+                                                         'scalar_encoder_fc1_input', 
                                                          'scalar_encoder_fc2_input',
                                                          'scalar_feature_size',
                                                          'entity_embedding_size',
@@ -126,19 +126,20 @@ ArchHyperParameters = namedtuple("ArchHyperParameters", ['batch_size',
                                                          'league_learner_num',
                                                          'actorloop_num'])
 
-# AlphaStar hyper
-AlphaStar_Input_Scale = 64  # default is 1
+# alphastar hyper parameters
+AlphaStar_Input_Scale = 64  # default is 1 on server
 AlphaStar_Arch_Hyper_Parameters = ArchHyperParameters(batch_size=int(512 / AlphaStar_Input_Scale),
-                                                      sequence_length=int(64 / AlphaStar_Input_Scale),
-                                                      max_selected=int(64 / AlphaStar_Input_Scale),
-                                                      max_entities=int(512 / AlphaStar_Input_Scale),
-                                                      minimap_size=128,
+                                                      sequence_length =int(64 / AlphaStar_Input_Scale),
+                                                      max_selected =int(64 / AlphaStar_Input_Scale),
+                                                      max_entities =int(512),
+                                                      minimap_size=128,                                                
                                                       embedding_size=3585,
                                                       map_channels=18,
+                                                      scatter_channels=16,
                                                       entity_x_y_index=24,
                                                       scalar_encoder_fc1_input=1504,
                                                       scalar_encoder_fc2_input=544,
-                                                      scalar_feature_size=7327,
+                                                      scalar_feature_size=7327,  # Deprecated
                                                       entity_embedding_size=256,
                                                       lstm_hidden_dim=384,
                                                       lstm_layers=3,
@@ -160,15 +161,16 @@ AlphaStar_Arch_Hyper_Parameters = ArchHyperParameters(batch_size=int(512 / Alpha
                                                       league_learner_num=12,
                                                       actorloop_num=16000)
 
-# mini alpha star hyper
-Mini_Scale = param.Mini_Scale  # default 16
-MiniStar_Arch_Hyper_Parameters = ArchHyperParameters(batch_size=int(96 / Mini_Scale),
-                                                     sequence_length=int(64 / Mini_Scale),
-                                                     max_selected=int(32 / Mini_Scale),
-                                                     max_entities=int(384 / Mini_Scale),
-                                                     minimap_size=64,
+# mini-alphastar hyper parameters
+Mini_Scale = param.Mini_Scale  # default is: 16 on laptop and 4 on server
+MiniStar_Arch_Hyper_Parameters = ArchHyperParameters(batch_size=int(64 / Mini_Scale),
+                                                     sequence_length=int(32 / Mini_Scale),
+                                                     max_selected=int(16 / Mini_Scale),                                                    
+                                                     max_entities=int(512),
+                                                     minimap_size=64,                                               
                                                      embedding_size=1545,
-                                                     map_channels=18 + 16,
+                                                     map_channels=18,
+                                                     scatter_channels=16,
                                                      entity_x_y_index=24,
                                                      scalar_encoder_fc1_input=864,
                                                      scalar_encoder_fc2_input=448,
@@ -207,7 +209,7 @@ else:
 SLTrainingHyperParameters = namedtuple('SLTrainingHyperParameters', ['num_epochs', 'learning_rate',
                                                                      'weight_decay', 'clip', 'seed'])
 
-SL_Training_Hyper_parameters = SLTrainingHyperParameters(num_epochs=100,
+SL_Training_Hyper_Parameters = SLTrainingHyperParameters(num_epochs=100,
                                                          learning_rate=1e-3,
                                                          weight_decay=1e-5,
                                                          clip=0.5,

@@ -9,7 +9,7 @@ from tensorflow_dl.mini_alpha_star.libs.hyper_params import Scalar_Feature_Size 
 from tensorflow_dl.mini_alpha_star.libs.hyper_params import StarCraft_Hyper_Parameters as SCHP
 from tensorflow_dl.mini_alpha_star.libs.transformer import Transformer
 
-debug = True
+debug = False
 
 
 class Baseline(tf.keras.Model):

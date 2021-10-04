@@ -238,7 +238,7 @@ def to_one_hot(y, n_dims=None):
     y_tensor = tf.reshape(tf.cast(y, dtype=tf.int64), shape=(-1, 1))
     n_dims = n_dims if n_dims is not None else int(tf.reduce_max(y_tensor)) + 1
 
-    return tf.one_hot(y_tensor, depth=n_dims)
+    return tf.reshape(tf.one_hot(y_tensor, depth=n_dims), shape=(*y.shape, -1))
 
 
 def action_can_be_queued(action_type):
